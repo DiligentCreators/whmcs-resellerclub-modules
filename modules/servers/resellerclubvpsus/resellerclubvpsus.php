@@ -2,6 +2,9 @@
 
 /**
  * WHMCS Module for Resellerclub's VPS
+ *
+ * Some Functions names changed and added DCVPS in the end to avoid redeclaration
+ * Credit DiligentCreators www.diligentcreators
  */
 // AddOn Module Name
 define('ADDON_MODULE_NAME', 'officialresellerclub');
@@ -67,7 +70,7 @@ function resellerclubvpsus_CreateAccount($params) {
         $client_details = $orderbox->api('GET', '/customers/details.json', array('username' => $params['clientsdetails']['email']), $response, 'resellerclubvpslinuxus', 'create');
 
         if (is_array($client_details) && strtolower($client_details['status']) == 'error') {
-            $resellerclub_customer_id = _createCustomer($params);
+            $resellerclub_customer_id = _createCustomerDCVPS($params);
         } else {
             $resellerclub_customer_id = $client_details['customerid'];
         }
@@ -272,7 +275,7 @@ function resellerclubvpsus_manualrenew($params) {
 
     if ($renew_result == "success") {
         // Get order details
-        $client_order_details = _get_order_details($params['clientsdetails']['userid'], $params['serviceid'], $params['domain'], $params['pid']);
+        $client_order_details = _get_order_detailsDCVPSDCVPS($params['clientsdetails']['userid'], $params['serviceid'], $params['domain'], $params['pid']);
 
         // Current Due Date of order
         $curr_duedate = $client_order_details['products']['product'][0]['nextduedate'];
@@ -363,7 +366,7 @@ function resellerclubvpsus_ClientArea($params) {
     if (isset($_POST['cplogin']) && strlen(trim($_POST['cplogin'])) > 0) {
         $cplogin_action = strtolower(trim($_POST['cplogin']));
         switch ($cplogin_action) {
-            case 'cpanel': _redirect_to_webhosting_control_panel($params);
+            case 'cpanel': _redirect_to_webhosting_control_panelDCVPS($params);
                 break;
             
         }
@@ -425,7 +428,7 @@ function resellerclubvpsus_ClientArea($params) {
             }
 
             $smarty->assign('vps_status', $order_details['currentstatus']);
-            $smarty->assign('vps_webhosting_panel', _display_webhosting_panel_form());
+            $smarty->assign('vps_webhosting_panel', _display_webhosting_panel_formDCVPS());
             
             $smarty->assign('vps_whmcs_key', $whmcs_licence_key);
             $smarty->assign('vps_ssl_ip_address', rtrim($ssl_ip_address,', '));
@@ -450,13 +453,15 @@ function resellerclubvpsus_ClientArea($params) {
 }
 
 function resellerclubvpsus_LoginLink($params) {
-    echo "<strong>Do Not Modify</strong>" . _display_control_panel_link($params);
+    echo "<strong>Do Not Modify</strong>" . _display_control_panel_linkDCVPS($params);
 }
 
 /**
  *  Make Orderbox API Calls
+ *  Functions name _createCustomer changed to _createCustomerDCVPS
+ *  Credit DiligentCreators www.diligentcreators
  */
-function _createCustomer($params) {
+function _createCustomerDCVPS($params) {
     global $orderbox;
     $customer_password = 'qwe' . rand(5000, 10000) . 'dsa';
     //TODO :: Set phone country code (phone-cc) appropriately
@@ -561,7 +566,13 @@ if (!function_exists('_get_plan_details')) {
 
 }
 
-function _get_order_details($user_id, $service_id, $domain, $product_id) {
+/**
+ *  Functions name _get_order_detailsDCVPS changed to _get_order_detailsDCVPSDCVPS
+ *  Credit DiligentCreators www.diligentcreators
+ *
+ */
+
+function _get_order_detailsDCVPSDCVPS($user_id, $service_id, $domain, $product_id) {
     $local_api_values = array(
         'clientid' => $user_id,
         'serviceid' => $service_id,
@@ -576,7 +587,7 @@ function _get_order_details($user_id, $service_id, $domain, $product_id) {
 if (!function_exists('_get_order_billing_cycle')) {
 
     function _get_order_billing_cycle($user_id, $service_id, $domain, $product_id) {
-        $client_order_details = _get_order_details($user_id, $service_id, $domain, $product_id);
+        $client_order_details = _get_order_detailsDCVPS($user_id, $service_id, $domain, $product_id);
         $billing_cycle = $client_order_details['products']['product'][0]['billingcycle'];
         return $billing_cycle;
     }
@@ -604,7 +615,11 @@ if (!function_exists('_get_order_duration_months')) {
 
 }
 
-function _display_control_panel_link($params) {
+/**
+ *  Functions name _display_control_panel_link changed to _display_control_panel_linkDCVPS
+ *  Credit DiligentCreators www.diligentcreators
+ */
+function _display_control_panel_linkDCVPS($params) {
 
     try {
         $control_panel_url = _get_control_panel_link($params);
@@ -615,14 +630,21 @@ function _display_control_panel_link($params) {
     }
 }
 
-function _redirect_to_webhosting_control_panel($params) {
+/**
+ *  Functions name _redirect_to_webhosting_control_panel changed to _redirect_to_webhosting_control_panelDCVPS
+ *  Credit DiligentCreators www.diligentcreators
+ */
+function _redirect_to_webhosting_control_panelDCVPS($params) {
     $control_panel_url = _get_control_panel_link($params) . '&service-name=webhosting';
     header("location: " . $control_panel_url);
     exit;
 }
 
-
-function _display_webhosting_panel_form() {
+/**
+ *  Functions name _display_webhosting_panel_form changed to _display_webhosting_panel_formDCVPS
+ *  Credit DiligentCreators www.diligentcreators
+ */
+function _display_webhosting_panel_formDCVPS() {
     $form_action_url = $_SERVER['REQUEST_URI'];
     $id = isset($_GET['id']) ? $_GET['id'] : ( isset($_POST['id']) ? $_POST['id'] : '' );
     $cp_form = "<form method=\"post\" action=\"{$form_action_url}\" target=\"_blank\">";
